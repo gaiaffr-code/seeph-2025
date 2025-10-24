@@ -1,548 +1,197 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>SEEPH 2025 - Parcours Interactif</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg,#4c51bf 0%,#6b46c1 100%);
-            min-height:100vh; padding:20px;
-        }
-        .container { max-width:900px; margin:0 auto; }
-        .screen {
-            background:white; border-radius:20px; padding:40px;
-            box-shadow:0 20px 60px rgba(0,0,0,0.3);
-        }
-        h1 { color:#4c51bf; text-align:center; font-size:2.5em; margin-bottom:10px; }
-        h2 { color:#6b46c1; text-align:center; font-size:1.5em; margin-bottom:30px; }
-        .intro-text { color:#555; line-height:1.6; margin-bottom:30px; text-align:center; }
-        .block-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; margin:30px 0; }
-        .block-card { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; padding:25px; border-radius:15px; text-align:center; }
-        .block-card h3 { font-size:1.2em; margin-bottom:10px; }
-        .btn {
-            background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-            color:white; border:none; padding:15px 40px; font-size:1.1em; font-weight:bold;
-            border-radius:30px; cursor:pointer; display:block; margin:30px auto; transition:transform .2s;
-        }
-        .btn:hover { transform:scale(1.05); }
-        .question-card { margin-bottom:30px; }
-        .situation-box { background:#f3f4f6; padding:20px; border-radius:10px; margin-bottom:20px; }
-        .question { font-size:1.3em; font-weight:bold; color:#333; margin-bottom:20px; }
-        .option {
-            background:white; border:2px solid #e5e7eb; padding:15px; margin:10px 0; border-radius:10px;
-            cursor:pointer; transition:all .2s;
-        }
-        .option:hover { border-color:#667eea; background:#f9fafb; }
-        .option.selected { border-color:#667eea; background:#eef2ff; }
-        .option.correct { border-color:#10b981; background:#d1fae5; }
-        .option.incorrect { border-color:#ef4444; background:#fee2e2; }
-        .explanation {
-            background:#fef3c7; border-left:4px solid #f59e0b; padding:20px; margin:20px 0; border-radius:5px;
-        }
-        .score-display { display:flex; justify-content:center; gap:20px; margin:20px 0; }
-        .score-box { background:#f3f4f6; padding:15px 30px; border-radius:10px; text-align:center; }
-        .score-box .number { font-size:2em; font-weight:bold; color:#667eea; }
-        .score-box .label { font-size:.9em; color:#666; }
-        .video-link {
-            display:inline-block; background:white; border:2px solid #667eea; color:#667eea;
-            padding:10px 20px; border-radius:20px; text-decoration:none; margin-top:15px; font-weight:600;
-        }
-        .video-link:hover { background:#667eea; color:white; }
-        .progress { text-align:center; color:#666; margin-bottom:20px; font-weight:600; }
-        .hidden { display:none; }
-        .block-transition { text-align:center; padding:40px; }
-        .block-transition h2 { color:#10b981; font-size:2em; margin-bottom:20px; }
-
-        /* Modal vidéo */
-        #videoModal {
-            display:none;
-            position:fixed; inset:0;
-            background: rgba(0,0,0,0.78);
-            justify-content:center; align-items:center; z-index:10000;
-        }
-        .videoWrap {
-            position:relative; width:90%; max-width:900px; border-radius:10px; overflow:hidden;
-            background:#000; box-shadow:0 30px 80px rgba(0,0,0,0.6);
-        }
-        .videoWrap iframe { width:100%; height:500px; border:0; display:block; }
-        .modalClose {
-            position:absolute; top:12px; right:12px; width:40px; height:40px; border-radius:50%;
-            background: rgba(255,255,255,0.08); color:#fff; font-size:20px; border:none; cursor:pointer;
-            display:flex; align-items:center; justify-content:center;
-        }
-
-        @media (max-width:768px) {
-            .screen { padding:20px; }
-            h1 { font-size:1.8em; }
-            .block-cards { grid-template-columns:1fr; }
-            .videoWrap iframe { height:260px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEEPH 2025 - Parcours Interactif</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg,#4c51bf 0%,#6b46c1 100%); min-height:100vh; padding:20px; }
+.container { max-width:900px; margin:0 auto; }
+.screen { background:white; border-radius:20px; padding:40px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+h1 { color:#4c51bf; text-align:center; font-size:2.5em; margin-bottom:10px; }
+h2 { color:#6b46c1; text-align:center; font-size:1.5em; margin-bottom:30px; }
+.intro-text { color:#555; line-height:1.6; margin-bottom:30px; text-align:center; }
+.block-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; margin:30px 0; }
+.block-card { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; padding:25px; border-radius:15px; text-align:center; }
+.block-card h3 { font-size:1.2em; margin-bottom:10px; }
+.btn { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; padding:15px 40px; font-size:1.1em; font-weight:bold; border-radius:30px; cursor:pointer; display:block; margin:30px auto; transition: transform 0.2s; }
+.btn:hover { transform:scale(1.05); }
+.question-card { margin-bottom:30px; }
+.situation-box { background:#f3f4f6; padding:20px; border-radius:10px; margin-bottom:20px; }
+.question { font-size:1.3em; font-weight:bold; color:#333; margin-bottom:20px; }
+.option { background:white; border:2px solid #e5e7eb; padding:15px; margin:10px 0; border-radius:10px; cursor:pointer; transition: all 0.2s; }
+.option:hover { border-color:#667eea; background:#f9fafb; }
+.option.selected { border-color:#667eea; background:#eef2ff; }
+.option.correct { border-color:#10b981; background:#d1fae5; }
+.option.incorrect { border-color:#ef4444; background:#fee2e2; }
+.explanation { background:#fef3c7; border-left:4px solid #f59e0b; padding:20px; margin:20px 0; border-radius:5px; }
+.score-display { display:flex; justify-content:center; gap:20px; margin:20px 0; }
+.score-box { background:#f3f4f6; padding:15px 30px; border-radius:10px; text-align:center; }
+.score-box .number { font-size:2em; font-weight:bold; color:#667eea; }
+.score-box .label { font-size:0.9em; color:#666; }
+.video-link { display:inline-block; background:white; border:2px solid #667eea; color:#667eea; padding:10px 20px; border-radius:20px; text-decoration:none; margin-top:15px; font-weight:600; }
+.video-link:hover { background:#667eea; color:white; }
+.progress { text-align:center; color:#666; margin-bottom:20px; font-weight:600; }
+.hidden { display:none; }
+.block-transition { text-align:center; padding:40px; }
+.block-transition h2 { color:#10b981; font-size:2em; margin-bottom:20px; }
+#videoPopup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000; }
+#videoPopup iframe { width:80%; height:60%; border:none; border-radius:10px; }
+#videoClose { position:absolute; top:20px; right:20px; font-size:2em; color:white; cursor:pointer; }
+@media(max-width:768px) { .screen { padding:20px; } h1 { font-size:1.8em; } .block-cards { grid-template-columns:1fr; } #videoPopup iframe { width:95%; height:50%; } }
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Écran d'accueil -->
-        <div id="welcomeScreen" class="screen">
-            <h1>🌟 SEEPH 2025</h1>
-            <h2>Parcours Interactif : Handicap et Santé Mentale</h2>
-            <p class="intro-text">
-                Bienvenue dans ce parcours immersif sur le handicap au travail, avec un focus particulier sur la <strong>santé mentale</strong>, cause nationale 2025 en France.
-            </p>
-            <p class="intro-text">
-                Vous allez vivre <strong>9 situations professionnelles réelles</strong> réparties en 2 blocs thématiques et prendre des décisions. Chaque choix compte pour construire un environnement de travail inclusif et bienveillant.
-            </p>
-
-            <div class="block-cards">
-                <div class="block-card">
-                    <h3>👁️ Bloc 1</h3>
-                    <p>Handicap Visible & Invisible</p>
-                    <p><strong>6 situations</strong></p>
-                </div>
-                <div class="block-card">
-                    <h3>🧠 Bloc 2</h3>
-                    <p>Santé Mentale & Burn-out</p>
-                    <p><strong>3 situations</strong></p>
-                </div>
-            </div>
-
-            <button class="btn" onclick="startGame()">Commencer le parcours →</button>
-        </div>
-
-        <!-- Écran de jeu -->
-        <div id="gameScreen" class="screen hidden">
-            <div class="score-display">
-                <div class="score-box">
-                    <div class="number" id="scoreDisplay">0</div>
-                    <div class="label">Connaissance</div>
-                </div>
-                <div class="score-box">
-                    <div class="number" id="empathyDisplay">0</div>
-                    <div class="label">Empathie</div>
-                </div>
-            </div>
-
-            <div class="progress" id="progressDisplay"></div>
-            <div id="questionContainer"></div>
-
-            <button id="validateBtn" class="btn hidden" onclick="validateAnswer()">Valider ma réponse</button>
-            <button id="nextBtn" class="btn hidden" onclick="nextQuestion()">Question suivante →</button>
-        </div>
-
-        <!-- Écran transition bloc -->
-        <div id="transitionScreen" class="screen hidden">
-            <div class="block-transition">
-                <h2>🎯 Bloc 1 terminé !</h2>
-                <div class="score-display">
-                    <div class="score-box">
-                        <div class="number" id="transScore">0</div>
-                        <div class="label">Connaissance</div>
-                    </div>
-                    <div class="score-box">
-                        <div class="number" id="transEmpathy">0</div>
-                        <div class="label">Empathie</div>
-                    </div>
-                </div>
-                <h3 style="margin:30px 0;">Bloc suivant : Santé Mentale & Burn-out</h3>
-                <p>3 nouvelles situations à découvrir</p>
-                <button class="btn" onclick="continueToBlock2()">Continuer vers le Bloc 2 →</button>
-            </div>
-        </div>
-
-        <!-- Écran final -->
-        <div id="finalScreen" class="screen hidden">
-            <h1>🎉 Félicitations !</h1>
-            <h2>Parcours terminé</h2>
-
-            <div class="score-display" style="margin:40px 0;">
-                <div class="score-box">
-                    <div class="number" id="finalScore">0</div>
-                    <div class="label">Connaissance / 90</div>
-                </div>
-                <div class="score-box">
-                    <div class="number" id="finalEmpathy">0</div>
-                    <div class="label">Empathie / 31</div>
-                </div>
-            </div>
-
-            <div id="profileMessage" style="background:#f3f4f6; padding:20px; border-radius:10px; margin:30px 0;"></div>
-
-            <div style="background:#eef2ff; padding:20px; border-radius:10px;">
-                <h3 style="color:#4c51bf; margin-bottom:15px;">📚 Pour aller plus loin</h3>
-                <ul style="list-style:none; line-height:2;">
-                    <li>• Contactez votre référent handicap</li>
-                    <li>• Participez au Duo Day pour découvrir d'autres réalités</li>
-                    <li>• Écoutez les podcasts sur la santé mentale au travail</li>
-                    <li>• Sensibilisez vos équipes à l'inclusion</li>
-                </ul>
-            </div>
-
-            <button class="btn" onclick="restartGame()">🔄 Recommencer le parcours</button>
-        </div>
+<div class="container">
+  <div id="welcomeScreen" class="screen">
+    <h1>🌟 SEEPH 2025</h1>
+    <h2>Parcours Interactif : Handicap et Santé Mentale</h2>
+    <p class="intro-text">
+      Bienvenue dans ce parcours immersif sur le handicap au travail, avec un focus particulier sur la <strong>santé mentale</strong>, cause nationale 2025 en France.
+    </p>
+    <p class="intro-text">
+      Vous allez vivre <strong>9 situations professionnelles réelles</strong> réparties en 2 blocs thématiques et prendre des décisions. Chaque choix compte pour construire un environnement de travail inclusif et bienveillant.
+    </p>
+    <div class="block-cards">
+      <div class="block-card"><h3>👁️ Bloc 1</h3><p>Handicap Visible & Invisible</p><p><strong>6 situations</strong></p></div>
+      <div class="block-card"><h3>🧠 Bloc 2</h3><p>Santé Mentale & Burn-out</p><p><strong>3 situations</strong></p></div>
     </div>
+    <button class="btn" onclick="startGame()">Commencer le parcours →</button>
+  </div>
 
-    <!-- MODALE VIDÉO -->
-    <div id="videoModal" aria-hidden="true">
-        <div class="videoWrap">
-            <button class="modalClose" aria-label="Fermer la vidéo" onclick="closeVideo()">✖</button>
-            <iframe id="videoFrame" src="" allowfullscreen></iframe>
-        </div>
+  <div id="gameScreen" class="screen hidden">
+    <div class="score-display">
+      <div class="score-box"><div class="number" id="scoreDisplay">0</div><div class="label">Connaissance</div></div>
+      <div class="score-box"><div class="number" id="empathyDisplay">0</div><div class="label">Empathie</div></div>
     </div>
+    <div class="progress" id="progressDisplay"></div>
+    <div id="questionContainer"></div>
+    <button id="validateBtn" class="btn hidden" onclick="validateAnswer()">Valider ma réponse</button>
+    <button id="nextBtn" class="btn hidden" onclick="nextQuestion()">Question suivante →</button>
+  </div>
 
-    <script>
-        /* ---------- DONNÉES ---------- */
-        const scenarios = [
-            // BLOC 1
-            {
-                block: 1,
-                category: "Reconnaissance du handicap",
-                situation: "Lors d'une formation sur le handicap, on vous demande de réfléchir aux maladies pouvant être reconnues comme handicap.",
-                question: "Parmi les maladies suivantes, lesquelles peuvent être reconnues comme un handicap ?",
-                options: [
-                    { text: "Le cancer", correct: true },
-                    { text: "La dyslexie", correct: true },
-                    { text: "La dépression", correct: true },
-                    { text: "Les troubles musculo-squelettiques (TMS)", correct: true },
-                    { text: "Le VIH / Sida", correct: true },
-                    { text: "Le diabète", correct: true }
-                ],
-                multipleChoice: true,
-                explanation: "Toutes ces pathologies peuvent être reconnues comme handicap ! Le handicap ne se limite pas au handicap visible. Une maladie chronique, psychique ou invalidante peut ouvrir des droits.",
-                video: "https://www.youtube.com/watch?v=sqx8JpwxclU",
-                empathyPoints: 2
-            },
-            {
-                block: 1,
-                category: "Reconversion professionnelle",
-                situation: "Marc, chauffeur poids lourd depuis 15 ans, a perdu l'usage d'un bras suite à un accident.",
-                question: "Lorsqu'un chauffeur poids lourd perd l'usage d'un bras, il ne peut plus exercer son métier.",
-                options: [
-                    { text: "Vrai", correct: false },
-                    { text: "Faux", correct: true }
-                ],
-                multipleChoice: false,
-                explanation: "FAUX ! Il existe des aménagements de poste et des dispositifs d'adaptation. Avec des aménagements techniques du véhicule et un accompagnement adapté, Marc peut continuer son métier.",
-                video: "https://www.youtube.com/watch?v=IoJHa-KcmkA",
-                empathyPoints: 3
-            },
-            {
-                block: 1,
-                category: "Ressources et accompagnement",
-                situation: "Sophie, votre collègue en situation de handicap, vous confie qu'elle se sent en difficulté dans son travail. Elle vous demande conseil.",
-                question: "Si un collègue en situation de handicap se sent en difficulté dans son travail, je lui conseille de... (plusieurs bonnes réponses)",
-                options: [
-                    { text: "Contacter le référent handicap de l'entreprise", correct: true },
-                    { text: "Prendre rendez-vous avec la médecine du travail", correct: true },
-                    { text: "Parler à son manager ou RH", correct: true },
-                    { text: "Contacter Cap emploi ou l'AGEFIPH", correct: true },
-                    { text: "Contacter France Travail", correct: false }
-                ],
-                multipleChoice: true,
-                explanation: "Toutes les réponses sont bonnes SAUF France Travail. En interne : référent handicap, médecine du travail, RH. En externe : Cap emploi et AGEFIPH.",
-                video: "https://www.youtube.com/watch?v=2Q-85nFvoZA",
-                empathyPoints: 3
-            },
-            {
-                block: 1,
-                category: "Aménagements horaires",
-                situation: "Karim doit recevoir des soins médicaux tôt le matin pour son handicap. Il ne sait pas comment aborder le sujet au travail.",
-                question: "Mon collègue handicapé doit recevoir des soins tôt le matin. Je lui conseille de...",
-                options: [
-                    { text: "Passer à temps partiel", correct: false },
-                    { text: "Demander à la médecine du travail un aménagement d'horaire", correct: true },
-                    { text: "Demander un traitement de faveur à la direction", correct: false }
-                ],
-                multipleChoice: false,
-                explanation: "C'est le rôle de la médecine du travail de préconiser des aménagements (horaires, poste...). Ce n'est pas un traitement de faveur mais un droit.",
-                video: "https://www.youtube.com/watch?v=CKypKZDP7Ho",
-                empathyPoints: 3
-            },
-            {
-                block: 1,
-                category: "Troubles du spectre autistique",
-                situation: "Léa, qui présente des troubles du spectre autistique (TSA), a tendance à parler très fort durant les réunions et à couper systématiquement la parole.",
-                question: "Comment réagir ?",
-                options: [
-                    { text: "Je la laisse faire et je m'adapte complètement", correct: false },
-                    { text: "Je lui rappelle simplement, sans m'énerver, les règles s'appliquant à tous", correct: true },
-                    { text: "Je ne l'invite plus aux réunions et lui envoie des comptes-rendus", correct: false }
-                ],
-                multipleChoice: false,
-                explanation: "Les personnes TSA peuvent avoir des difficultés avec les codes sociaux implicites. Un rappel bienveillant et explicite des règles les aide.",
-                video: "https://www.youtube.com/watch?v=P2FDaXCL5u8",
-                empathyPoints: 3
-            },
-            {
-                block: 1,
-                category: "Accompagnement maladie grave",
-                situation: "Nadia vient de vous annoncer qu'elle a un cancer. Vous êtes son collègue proche et souhaitez bien réagir.",
-                question: "Quelle(s) attitude(s) adopter ? (Plusieurs réponses)",
-                options: [
-                    { text: "Je lui demande si elle a déjà pris RDV avec la médecine du travail", correct: true },
-                    { text: "Je ne dis rien pour bien séparer professionnel et personnel", correct: false },
-                    { text: "Je prends l'initiative de faire une partie de son travail", correct: false },
-                    { text: "Je l'assure de ma présence et disponibilité en cas de besoin", correct: true }
-                ],
-                multipleChoice: true,
-                explanation: "Orienter vers la médecine du travail est utile pour les aménagements. Lui montrer votre soutien sans l'infantiliser est essentiel.",
-                video: "https://www.youtube.com/shorts/aLB_c_1YjP8",
-                empathyPoints: 4
-            },
-            // BLOC 2
-            {
-                block: 2,
-                category: "Santé mentale - Dépression",
-                situation: "Alex, qui a déjà connu des épisodes de dépression, s'isole progressivement et communique de moins en moins avec l'équipe depuis quelques semaines.",
-                question: "Quelle est la bonne attitude à adopter ?",
-                options: [
-                    { text: "Je tente d'établir un dialogue bienveillant", correct: true },
-                    { text: "Je le laisse tranquille, il reviendra de lui-même", correct: false }
-                ],
-                multipleChoice: false,
-                explanation: "L'isolement est un signal d'alerte. Tenter un dialogue bienveillant peut aider Alex à demander de l'aide. Votre écoute compte !",
-                video: "https://www.youtube.com/watch?v=zqHJq6vUxxE",
-                empathyPoints: 4
-            },
-            {
-                block: 2,
-                category: "Burn-out - Signaux d'alerte",
-                situation: "Vous observez des changements de comportement chez plusieurs collègues et vous vous interrogez sur les signes d'un burn-out.",
-                question: "Quels sont les signes d'un risque de burn-out ? (Plusieurs bonnes réponses)",
-                options: [
-                    { text: "Fatigue intense persistante", correct: true },
-                    { text: "Difficultés de concentration", correct: true },
-                    { text: "Retrait social", correct: true },
-                    { text: "Motivation excessive", correct: false }
-                ],
-                multipleChoice: true,
-                explanation: "Selon l'OMS, le burn-out est un syndrome lié à un stress chronique non géré au travail. La fatigue persistante, les difficultés de concentration et le retrait social sont des signes d'alerte majeurs.",
-                video: "https://youtu.be/n24awcIMvrA",
-                empathyPoints: 4
-            },
-            {
-                block: 2,
-                category: "Retour après arrêt maladie",
-                situation: "Julie s'apprête à reprendre son poste après un arrêt maladie de longue durée. Elle vous demande conseil.",
-                question: "Une collègue s'apprête à reprendre après un arrêt maladie long. Que faire ? (Plusieurs bonnes réponses)",
-                options: [
-                    { text: "Rassurer tout le monde sur son état, même si ses problèmes ne sont pas réglés", correct: false },
-                    { text: "Anticiper son retour avec la médecine du travail et son responsable", correct: true },
-                    { text: "Rattraper le temps perdu en redoublant d'efforts", correct: false },
-                    { text: "Engager une démarche de reconnaissance du handicap", correct: true }
-                ],
-                multipleChoice: true,
-                explanation: "Un retour anticipé avec la médecine du travail permet un aménagement adapté. La RQTH peut ouvrir des droits. Se surcharger risque une rechute.",
-                video: "https://www.youtube.com/watch?v=fWYg4uJ73mU",
-                empathyPoints: 4
-            }
-        ];
+  <div id="transitionScreen" class="screen hidden">
+    <div class="block-transition">
+      <h2>🎯 Bloc 1 terminé !</h2>
+      <div class="score-display">
+        <div class="score-box"><div class="number" id="transScore">0</div><div class="label">Connaissance</div></div>
+        <div class="score-box"><div class="number" id="transEmpathy">0</div><div class="label">Empathie</div></div>
+      </div>
+      <h3 style="margin:30px 0;">Bloc suivant : Santé Mentale & Burn-out</h3>
+      <p>3 nouvelles situations à découvrir</p>
+      <button class="btn" onclick="continueToBlock2()">Continuer vers le Bloc 2 →</button>
+    </div>
+  </div>
 
-        /* ---------- ÉTAT DU JEU ---------- */
-        let currentQuestion = 0;
-        let score = 0;
-        let empathyScore = 0;
-        let selectedAnswers = [];
+  <div id="finalScreen" class="screen hidden">
+    <h1>🎉 Félicitations !</h1>
+    <h2>Parcours terminé</h2>
+    <div class="score-display" style="margin:40px 0;">
+      <div class="score-box"><div class="number" id="finalScore">0</div><div class="label">Connaissance / 90</div></div>
+      <div class="score-box"><div class="number" id="finalEmpathy">0</div><div class="label">Empathie / 31</div></div>
+    </div>
+    <div id="profileMessage" style="background:#f3f4f6; padding:20px; border-radius:10px; margin:30px 0;"></div>
+    <div style="background:#eef2ff; padding:20px; border-radius:10px;">
+      <h3 style="color:#4c51bf; margin-bottom:15px;">📚 Pour aller plus loin</h3>
+      <ul style="list-style:none; line-height:2;">
+        <li>• Contactez votre référent handicap</li>
+        <li>• Participez au Duo Day pour découvrir d'autres réalités</li>
+        <li>• Écoutez les podcasts sur la santé mentale au travail</li>
+        <li>• Sensibilisez vos équipes à l'inclusion</li>
+      </ul>
+    </div>
+    <button class="btn" onclick="restartGame()">🔄 Recommencer le parcours</button>
+  </div>
+</div>
 
-        /* ---------- FONCTIONS D'AFFICHAGE ---------- */
-        function startGame() {
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            loadQuestion();
-        }
+<div id="videoPopup">
+  <div id="videoClose" onclick="closeVideo()">❌</div>
+  <iframe id="videoFrame" src="" allowfullscreen></iframe>
+</div>
 
-        function loadQuestion() {
-            const scenario = scenarios[currentQuestion];
-            selectedAnswers = [];
-            document.getElementById('progressDisplay').textContent = `Question ${currentQuestion + 1} / ${scenarios.length}`;
+<script>
+const scenarios = [
+  // Bloc 1
+  { block:1, category:"Reconnaissance du handicap", situation:"...", question:"...", options:[{text:"Le cancer", correct:true}], multipleChoice:true, explanation:"...", video:"https://www.youtube.com/watch?v=sqx8JpwxclU", empathyPoints:2 },
+  { block:1, category:"Reconversion professionnelle", situation:"...", question:"...", options:[{text:"Vrai", correct:false}], multipleChoice:false, explanation:"...", video:"https://www.youtube.com/watch?v=IoJHa-KcmkA", empathyPoints:3 },
+  { block:1, category:"Ressources et accompagnement", situation:"...", question:"...", options:[{text:"Contacter le référent handicap de l'entreprise", correct:true}], multipleChoice:true, explanation:"...", video:"https://www.youtube.com/watch?v=2Q-85nFvoZA", empathyPoints:3 },
+  { block:1, category:"Aménagements horaires", situation:"...", question:"...", options:[{text:"Passer à temps partiel", correct:false}], multipleChoice:false, explanation:"...", video:"https://www.youtube.com/watch?v=CKypKZDP7Ho", empathyPoints:3 },
+  { block:1, category:"Troubles du spectre autistique", situation:"...", question:"...", options:[{text:"Je la laisse faire", correct:false}], multipleChoice:false, explanation:"...", video:"https://www.youtube.com/watch?v=P2FDaXCL5u8", empathyPoints:3 },
+  { block:1, category:"Accompagnement maladie grave", situation:"Nadia vient de vous annoncer qu'elle a un cancer. Vous êtes son collègue proche et souhaitez bien réagir.", question:"Quelle(s) attitude(s) adopter ? (Plusieurs réponses)", options:[{text:"Je lui demande si elle a déjà pris RDV avec la médecine du travail", correct:true},{text:"Je ne dis rien pour bien séparer professionnel et personnel", correct:false},{text:"Je prends l'initiative de faire une partie de son travail", correct:false},{text:"Je l'assure de ma présence et disponibilité en cas de besoin", correct:true}], multipleChoice:true, explanation:"Orienter vers la médecine du travail est utile pour les aménagements. Lui montrer votre soutien sans l'infantiliser est essentiel.", video:"https://www.youtube.com/shorts/aLB_c_1YjP8", empathyPoints:4 },
+  // Bloc 2 ...
+];
 
-            let html = `
-                <div class="question-card">
-                    <div style="background:#eef2ff;padding:15px;border-radius:10px;margin-bottom:20px;">
-                        <strong style="color:#667eea;">${scenario.category}</strong>
-                    </div>
-                    <div class="situation-box">
-                        <strong>📖 Situation</strong><br>${scenario.situation}
-                    </div>
-                    <div class="question">${scenario.question}</div>
-                    <div id="optionsContainer">
-            `;
-            scenario.options.forEach((option, index) => {
-                html += `<div class="option" onclick="selectOption(${index})" id="option${index}">${option.text}</div>`;
-            });
-            html += `</div></div>`;
-            document.getElementById('questionContainer').innerHTML = html;
-            document.getElementById('validateBtn').classList.remove('hidden');
-            document.getElementById('nextBtn').classList.add('hidden');
-        }
+let currentQuestion = 0, score = 0, empathyScore = 0, selectedAnswers = [];
 
-        function selectOption(index) {
-            const scenario = scenarios[currentQuestion];
-            if (scenario.multipleChoice) {
-                const optionEl = document.getElementById('option' + index);
-                if (selectedAnswers.includes(index)) {
-                    selectedAnswers = selectedAnswers.filter(i => i !== index);
-                    optionEl.classList.remove('selected');
-                } else {
-                    selectedAnswers.push(index);
-                    optionEl.classList.add('selected');
-                }
-            } else {
-                selectedAnswers = [index];
-                for (let i = 0; i < scenario.options.length; i++) {
-                    document.getElementById('option' + i).classList.remove('selected');
-                }
-                document.getElementById('option' + index).classList.add('selected');
-            }
-        }
+function startGame() {
+  document.getElementById('welcomeScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  loadQuestion();
+}
 
-        /* ---------- VALIDATION ---------- */
-        function validateAnswer() {
-            if (selectedAnswers.length === 0) {
-                alert('Veuillez sélectionner au moins une réponse');
-                return;
-            }
+function loadQuestion() {
+  const scenario = scenarios[currentQuestion];
+  selectedAnswers = [];
+  document.getElementById('progressDisplay').textContent = `${scenario.category} – Question ${currentQuestion+1} / ${scenarios.length}`;
+  
+  let html = `<div class="question-card">
+  <div style="background:#eef2ff;padding:15px;border-radius:10px;margin-bottom:20px;"><strong style="color:#667eea;">${scenario.category}</strong></div>
+  <div class="situation-box"><strong>📖 Situation</strong><br>${scenario.situation}</div>
+  <div class="question">${scenario.question}</div>
+  <div id="optionsContainer">`;
+  
+  scenario.options.forEach((opt,i)=>{ html+=`<div class="option" onclick="selectOption(${i})" id="option${i}">${opt.text}</div>`; });
+  html += `</div></div>`;
+  
+  document.getElementById('questionContainer').innerHTML = html;
+  document.getElementById('validateBtn').classList.remove('hidden');
+  document.getElementById('nextBtn').classList.add('hidden');
+}
 
-            const scenario = scenarios[currentQuestion];
-            let isCorrect = false;
+function selectOption(index) {
+  const scenario = scenarios[currentQuestion];
+  if(scenario.multipleChoice){
+    const optionEl=document.getElementById('option'+index);
+    if(selectedAnswers.includes(index)){ selectedAnswers=selectedAnswers.filter(i=>i!==index); optionEl.classList.remove('selected'); }
+    else { selectedAnswers.push(index); optionEl.classList.add('selected'); }
+  } else {
+    selectedAnswers=[index];
+    scenario.options.forEach((_,i)=>document.getElementById('option'+i).classList.remove('selected'));
+    document.getElementById('option'+index).classList.add('selected');
+  }
+}
 
-            if (scenario.multipleChoice) {
-                const correctIndices = scenario.options.map((opt, idx) => opt.correct ? idx : -1).filter(idx => idx !== -1);
-                const sortedSelected = [...selectedAnswers].sort();
-                const sortedCorrect = [...correctIndices].sort();
-                isCorrect = JSON.stringify(sortedSelected) === JSON.stringify(sortedCorrect);
-            } else {
-                isCorrect = scenario.options[selectedAnswers[0]].correct;
-            }
+function validateAnswer() {
+  if(selectedAnswers.length===0){ alert('Veuillez sélectionner au moins une réponse'); return; }
+  const scenario = scenarios[currentQuestion];
+  let isCorrect=false;
+  if(scenario.multipleChoice){
+    const correctIndices=scenario.options.map((o,i)=>o.correct?i:-1).filter(i=>i!==-1);
+    isCorrect=JSON.stringify([...selectedAnswers].sort())===JSON.stringify([...correctIndices].sort());
+  } else { isCorrect=scenario.options[selectedAnswers[0]].correct; }
 
-            if (isCorrect) {
-                score += 10;
-                empathyScore += scenario.empathyPoints || 0;
-            }
+  scenario.options.forEach((opt,i)=>{
+    const el=document.getElementById('option'+i);
+    el.style.pointerEvents='none';
+    if(opt.correct) el.classList.add('correct');
+    else if(selectedAnswers.includes(i)) el.classList.add('incorrect');
+  });
 
-            scenario.options.forEach((option, index) => {
-                const optionEl = document.getElementById('option' + index);
-                optionEl.style.pointerEvents = 'none';
-                if (option.correct) optionEl.classList.add('correct');
-                else if (selectedAnswers.includes(index)) optionEl.classList.add('incorrect');
-            });
+  let explanationHtml = `<div class="explanation"><strong>${isCorrect?'✅ Bravo !':'💡 À retenir'}</strong><br><br>${scenario.explanation}${scenario.video?`<br><br><a class="video-link" href="#" onclick="openVideo('${scenario.video}')">🎥 Voir la vidéo explicative</a>`:''}</div>`;
+  document.getElementById('optionsContainer').insertAdjacentHTML('afterend', explanationHtml);
 
-            /* création de l'encart d'explication + bouton vidéo (sans target=_blank) */
-            const explanationDiv = document.createElement('div');
-            explanationDiv.className = 'explanation';
-            explanationDiv.innerHTML = `<strong>${isCorrect ? '✅ Bravo !' : '💡 À retenir'}</strong><br><br>${scenario.explanation}`;
+  score+=isCorrect?10:0;
+  empathyScore+=scenario.empathyPoints;
+  document.getElementById('scoreDisplay').textContent=score;
+  document.getElementById('empathyDisplay').textContent=empathyScore;
+  document.getElementById('validateBtn').classList.add('hidden');
+  document.getElementById('nextBtn').classList.remove('hidden');
+}
 
-            if (scenario.video) {
-                const a = document.createElement('a');
-                a.href = '#';
-                a.className = 'video-link';
-                a.textContent = '🎥 Voir la vidéo explicative';
-                a.addEventListener('click', (ev) => {
-                    ev.preventDefault();
-                    openVideo(scenario.video);
-                });
-                explanationDiv.appendChild(document.createElement('br'));
-                explanationDiv.appendChild(document.createElement('br'));
-                explanationDiv.appendChild(a);
-            }
+function nextQuestion() { currentQuestion++; if(currentQuestion===6){ document.getElementById('gameScreen').classList.add('hidden'); document.getElementById('transitionScreen').classList.remove('hidden'); document.getElementById('transScore').textContent=score; document.getElementById('transEmpathy').textContent=empathyScore; } else if(currentQuestion>=scenarios.length){ showFinal(); } else { loadQuestion(); } }
 
-            document.getElementById('optionsContainer').insertAdjacentElement('afterend', explanationDiv);
+function continueToBlock2(){ document.getElementById('transitionScreen').classList.add('hidden'); document.getElementById('gameScreen').classList.remove('hidden'); loadQuestion(); }
 
-            document.getElementById('scoreDisplay').textContent = score;
-            document.getElementById('empathyDisplay').textContent = empathyScore;
-            document.getElementById('validateBtn').classList.add('hidden');
-            document.getElementById('nextBtn').classList.remove('hidden');
-        }
-
-        /* ---------- NAVIGATION ---------- */
-        function nextQuestion() {
-            currentQuestion++;
-            if (currentQuestion === 6) {
-                document.getElementById('gameScreen').classList.add('hidden');
-                document.getElementById('transitionScreen').classList.remove('hidden');
-                document.getElementById('transScore').textContent = score;
-                document.getElementById('transEmpathy').textContent = empathyScore;
-            } else if (currentQuestion >= scenarios.length) {
-                showFinal();
-            } else {
-                loadQuestion();
-            }
-        }
-
-        function continueToBlock2() {
-            document.getElementById('transitionScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            loadQuestion();
-        }
-
-        function showFinal() {
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('finalScreen').classList.remove('hidden');
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalEmpathy').textContent = empathyScore;
-
-            const scorePercent = (score / 90) * 100;
-            const empathyPercent = (empathyScore / 31) * 100;
-
-            let profileMsg = '';
-            if (scorePercent >= 80 && empathyPercent >= 80) {
-                profileMsg = "<strong>🏆 Champion de l'inclusion !</strong><br>Vous avez d'excellentes connaissances et une grande sensibilité aux situations de handicap. Vous êtes un véritable acteur du changement dans votre entreprise.";
-            } else if (scorePercent >= 60) {
-                profileMsg = "<strong>👍 En bonne voie !</strong><br>Vous avez de bonnes bases sur le handicap au travail. Continuez à vous informer et à être à l'écoute de vos collègues.";
-            } else {
-                profileMsg = "<strong>🌱 Débutant motivé !</strong><br>Ce parcours vous a permis de découvrir de nombreuses situations. N'hésitez pas à consulter les ressources pour approfondir vos connaissances.";
-            }
-            document.getElementById('profileMessage').innerHTML = profileMsg;
-        }
-
-        function restartGame() {
-            currentQuestion = 0; score = 0; empathyScore = 0; selectedAnswers = [];
-            document.getElementById('finalScreen').classList.add('hidden');
-            document.getElementById('welcomeScreen').classList.remove('hidden');
-            document.getElementById('scoreDisplay').textContent = 0;
-            document.getElementById('empathyDisplay').textContent = 0;
-        }
-
-        /* ---------- MODAL VIDEO ---------- */
-        function convertToEmbed(url) {
-            if (!url) return url;
-            // YouTube watch -> embed
-            if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/');
-            // youtu.be -> embed
-            if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'www.youtube.com/embed/');
-            // already embed or other host
-            return url;
-        }
-
-        function openVideo(url) {
-            const modal = document.getElementById('videoModal');
-            const frame = document.getElementById('videoFrame');
-            frame.src = convertToEmbed(url) + (convertToEmbed(url).includes('?') ? '&' : '?') + 'rel=0&autoplay=1';
-            modal.style.display = 'flex';
-            modal.setAttribute('aria-hidden', 'false');
-        }
-
-        function closeVideo() {
-            const modal = document.getElementById('videoModal');
-            const frame = document.getElementById('videoFrame');
-            frame.src = '';
-            modal.style.display = 'none';
-            modal.setAttribute('aria-hidden', 'true');
-        }
-
-        // fermer en cliquant hors du contenu
-        document.getElementById('videoModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('videoModal')) closeVideo();
-        });
-
-        // accessibilité : échap ferme
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const modal = document.getElementById('videoModal');
-                if (modal.style.display === 'flex') closeVideo();
-            }
-        });
-    </script>
-</body>
-</html>
+function showFinal() {
+  document.getElementById('gameScreen').classList.add('hidden'); document.getElementById('finalScreen').classList.remove
